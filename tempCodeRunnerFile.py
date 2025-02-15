@@ -1,4 +1,3 @@
-    temp[mid_row, 0] = 0
-    temp[mid_row, 79] = 0
-    temp[0, mid_col] = 0
-    temp[59, mid_col] = 0
+
+                color = FLOOR_COLOR if cells[row, col] == 0 else WALL_COLOR
+                pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))

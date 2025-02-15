@@ -1,3 +1,6 @@
-
-                color = FLOOR_COLOR if cells[row, col] == 0 else WALL_COLOR
-                pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
+# Handle player movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player_x > 0:
+        player_x -= player_speed
+    if keys[pygame.K_RIGHT] and player_x < screen_width - player_width:
+        player_x += player_speed

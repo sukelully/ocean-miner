@@ -42,10 +42,10 @@ def generate_map(screen, cells, size, with_progress=False):
     temp[:, temp_w - 1] = 1  # Right
     temp[temp_h - 1, :] = 1  # Bottom
 
+    # Set the five rows/columns on either side of the middle to zero
     mid_row = findArrayMid(temp[:, 0])
     mid_col = findArrayMid(temp[0, :])
 
-    # Set the five rows/columns on either side of the middle to zero
     temp[mid_row-5:mid_row+6, 0] = 0
     temp[mid_row-5:mid_row+6, temp_w - 1] = 0
     temp[0, mid_col-5:mid_col+6] = 0
@@ -63,7 +63,7 @@ def drawPlayer(screen, player_x, player_y):
 def main():
     pygame.init()
     size = 10
-    player_speed = 0
+    player_speed = 2
     cells_w = int(round(SCREEN_W / size))
     cells_h = int(round(SCREEN_H / size))
 
@@ -104,7 +104,6 @@ def main():
             mapgen_count += 1
         else:
             keys = pygame.key.get_pressed()
-            player_speed += 0.02
             if keys[pygame.K_LEFT] and player_x > 0:
                 player_x -= player_speed
             if keys[pygame.K_RIGHT] and player_x < SCREEN_W - player_width:

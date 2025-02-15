@@ -10,10 +10,14 @@ FLOOR_COLOR = (255, 255, 255)
 FLOOR_NEXT_COL = (0, 0, 255)
 FLOOR_PROB = 0.7
 WALL_PROB = 0.3
+SCREEN_W = 800
+SCREEN_H = 600
 
 def update(screen, cells, size, with_progress=False):
     # Create temporary matrix of zeros
     temp = np.zeros((cells.shape[0], cells.shape[1]))
+    temp_w = len(temp[0])
+    temp_h = len(temp)
     
     for row, col in np.ndindex(cells.shape):
         walls = np.sum(cells[row - 1:row + 2, col-1:col+2]) - cells[row, col]      
@@ -33,12 +37,36 @@ def update(screen, cells, size, with_progress=False):
         pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
     
     # Set borders to walls
-    temp[0:60, 0] = 1
-    temp[0, 0:80] = 1
-    temp[0:60, 79] = 1
-    temp[59, 0:80] = 1  
-        
+    temp[0:60, 0] = 1           # Left
+    temp[0, 0:80] = 1           # Top
+    temp[0:60, 79] = 1          # Right
+    temp[59, 0:80] = 0          # Bottom
+
+    # Set doorways in centre
+    temp[30, 0] = 0
+
+    # Set middle of the borders to zero
+    mid_row = findArrayMid(temp[:, 0])
+    mid_col = findArrayMid(temp[0, :])
+
+    print(mid_row)
+
+    # temp[mid_row, 0] = 0
+    # temp[mid_row, 79] = 0
+    # temp[0, mid_col] = 0
+    # temp[59, mid_col] = 0
+
+    # print(findArrayMid(temp[1]))
+
     return temp
+
+def findArrayMid(array):
+    mid = float(len(array)) / 2
+    if mid % 2 == 0:
+        return (int(mid), int(mid - 1))
+    else:
+        return int(mid - 0.5)
+
 
 def main():
     # Initialise pygame
@@ -46,10 +74,6 @@ def main():
 
     # Set size of cells
     size = 10
-
-    # Set screen size
-    SCREEN_W = 800
-    SCREEN_H = 600
 
     # Set dimension of cells and their initial configuration
     cells = np.random.choice(2, size=(60, 80), p=[FLOOR_PROB, WALL_PROB])

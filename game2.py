@@ -3,15 +3,17 @@ import pygame
 import time
 import sys
 
-# Set colors
+# Set globals
 WALL_COLOR = (50, 50, 50)
 GRID_COLOR = (0, 0, 0)
 FLOOR_COLOR = (255, 255, 255)
 FLOOR_NEXT_COL = (0, 0, 255)
 FLOOR_PROB = 0.7
 WALL_PROB = 0.3
-SCREEN_W = 800
+SCREEN_W = 400
 SCREEN_H = 600
+mapgen_count = 0
+
 
 def update(screen, cells, size, with_progress=False):
     # Create temporary matrix of zeros
@@ -37,10 +39,10 @@ def update(screen, cells, size, with_progress=False):
         pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
     
     # Set borders to walls
-    temp[0:60, 0] = 1           # Left
-    temp[0, 0:80] = 1           # Top
-    temp[0:60, 79] = 1          # Right
-    temp[59, 0:80] = 0          # Bottom
+    temp[0:temp_h, 0] = 1           # Left
+    temp[0, 0:temp_w] = 1           # Top
+    temp[0:temp_h, temp_w-1] = 1          # Right
+    temp[temp_h-1, 0:temp_w] = 1          # Bottom
 
     # Set doorways in centre
     temp[30, 0] = 0
@@ -57,6 +59,7 @@ def update(screen, cells, size, with_progress=False):
     # temp[59, mid_col] = 0
 
     # print(findArrayMid(temp[1]))
+    # mapgen_count += 1
 
     return temp
 
@@ -74,14 +77,17 @@ def main():
 
     # Set size of cells
     size = 10
+    cells_w = int(round(SCREEN_W / size))
+    cells_h = int(round(SCREEN_H / size))
 
     # Set dimension of cells and their initial configuration
-    cells = np.random.choice(2, size=(60, 80), p=[FLOOR_PROB, WALL_PROB])
+    cells = np.random.choice(2, size=(cells_h, cells_w), p=[FLOOR_PROB, WALL_PROB])
 
-    cells[0:60, 0] = 1
-    cells[0, 0:80] = 1
-    cells[0:60, 79] = 1
-    cells[59, 0:80] = 1
+    # Set borders to walls
+    cells[0:cells_h, 0] = 1
+    cells[0, 0:cells_w] = 1
+    cells[0:cells_h, cells_w-1] = 1
+    cells[cells_h-1, 0:cells_w] = 1
 
     # Init screen
     screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))

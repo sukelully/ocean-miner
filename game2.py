@@ -17,6 +17,9 @@ player_width = 20
 player_height = 10
 player_max_speed = 5
 
+# Set the frame rate
+clock = pygame.time.Clock()
+
 # Generate map with four exits
 def generate_map(screen, cells, size, with_progress=False):
     temp = np.zeros((cells.shape[0], cells.shape[1]))
@@ -37,12 +40,12 @@ def generate_map(screen, cells, size, with_progress=False):
         pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
     
     # Set window borders to walls
-    temp[:, 0] = 1           # Left
-    temp[0, :] = 1           # Top
-    temp[:, temp_w - 1] = 1  # Right
-    temp[temp_h - 1, :] = 1  # Bottom
+    temp[:, 0] = 1              # Left
+    temp[0, :] = 1              # Top
+    temp[:, temp_w - 1] = 1     # Right
+    temp[temp_h - 1, :] = 1     # Bottom
 
-    # Set the five rows/columns on either side of the middle to zero
+    # Create an 5 cell wide exit point on all borders
     mid_row = findArrayMid(temp[:, 0])
     mid_col = findArrayMid(temp[0, :])
 

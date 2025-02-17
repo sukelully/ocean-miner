@@ -24,7 +24,44 @@ velocity = pygame.Vector2(0, 0)
 # Set the frame rate
 clock = pygame.time.Clock()
 
-# Generates a random map given a blank grid
+
+
+# Draw player at specified position
+def drawPlayer(screen):
+    pygame.draw.rect(screen, (0, 175, 255), (int(player_pos.x), int(player_pos.y), player_width, player_height))
+
+# Return true if cell is a wall
+def is_wall(x, y, cells, size):
+    grid_x, grid_y = int(x / size), int(y / size)
+    return cells[grid_y, grid_x] == 1
+
+# Collision checking
+def detect_collision(rect1, cells, size):
+    collision_detected = False
+    for row, col in np.ndindex(cells.shape):
+        if cells[row, col] == 1:  # If the cell is a wall
+            wall_rect = pygame.Rect(col * size, row * size, size, size)
+            if rect1.colliderect(wall_rect):
+                collision_detected = True
+                break
+
+    return collision_detected
+
+# Initialise a cell grid with random values to seed map generation
+def initialise_map(cells_w, cells_h):
+    cells = np.random.choice(2, size=(cells_h, cells_w), p=[FLOOR_PROB, WALL_PROB])
+    cells[0:cells_h, 0] = 1
+    cells[0, 0:cells_w] = 1
+    cells[0:cells_h, cells_w - 1] = 1
+    cells[cells_h - 1, 0:cells_w] = 1
+
+    # Blank area for player spawn
+    mid_row, mid_col = len(cells) // 2, len(cells[0]) // 2
+    cells[mid_row-5:mid_row+5, mid_col-5:mid_col+5] = 0
+
+    return cells
+
+# Generates a random map given a random seed
 def generate_map(screen, cells, size):
     temp = np.zeros((cells.shape[0], cells.shape[1]))
     temp_w, temp_h = len(temp[0]), len(temp)
@@ -54,45 +91,6 @@ def generate_map(screen, cells, size):
 
     return temp
 
-# Draw player at specified position
-def drawPlayer(screen):
-    pygame.draw.rect(screen, (0, 175, 255), (int(player_pos.x), int(player_pos.y), player_width, player_height))
-
-# Return true if cell is a wall
-def is_wall(x, y, cells, size):
-    grid_x, grid_y = int(x / size), int(y / size)
-    return cells[grid_y, grid_x] == 1
-
-# Initialise a cell grid with random values to seed map generation
-def initialise_map(screen, cells_w, cells_h):
-    cells = np.random.choice(2, size=(cells_h, cells_w), p=[FLOOR_PROB, WALL_PROB])
-    cells[0:cells_h, 0] = 1
-    cells[0, 0:cells_w] = 1
-    cells[0:cells_h, cells_w - 1] = 1
-    cells[cells_h - 1, 0:cells_w] = 1
-
-    # Blank area for player spawn
-    mid_row, mid_col = len(cells) // 2, len(cells[0]) // 2
-    cells[mid_row-5:mid_row+5, mid_col-5:mid_col+5] = 0
-
-    screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
-    screen.fill(GRID_COLOR)
-
-    return cells
-
-# Collision checking
-def detect_collision(rect1, cells, size):
-    collision_detected = False
-    for row, col in np.ndindex(cells.shape):
-        if cells[row, col] == 1:  # If the cell is a wall
-            wall_rect = pygame.Rect(col * size, row * size, size, size)
-            if rect1.colliderect(wall_rect):
-                collision_detected = True
-                break
-
-    return collision_detected
-
-
 def main():
     global velocity, player_pos  # Ensure these persist across frames
     pygame.init()
@@ -100,10 +98,8 @@ def main():
     cells_w, cells_h = SCREEN_W // size, SCREEN_H // size
 
     screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
-
-    cells = initialise_map(screen, cells_w, cells_h)
-
     screen.fill(GRID_COLOR)
+    cells = initialise_map(cells_w, cells_h)
 
     mapgen_count = 0
 
@@ -118,7 +114,7 @@ def main():
                 sys.exit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 mapgen_count = 0
-                cells = initialise_map(screen, cells_w, cells_h)
+                cells = initialise_map(cells_w, cells_h)
 
         # Map generation
         if mapgen_count < 4:
@@ -163,19 +159,19 @@ def main():
             if player_pos.x > SCREEN_W:
                 new_pos.x = 0
                 mapgen_count = 0
-                cells = initialise_map(screen, cells_w, cells_h)
+                cells = initialise_map(cells_w, cells_h)
             elif player_pos.x < 0:
                 new_pos.x = SCREEN_W
                 mapgen_count = 0
-                cells = initialise_map(screen, cells_w, cells_h)
+                cells = initialise_map(cells_w, cells_h)
             elif player_pos.y > SCREEN_H:
                 new_pos.y = 0
                 mapgen_count = 0
-                cells = initialise_map(screen, cells_w, cells_h)
+                cells = initialise_map(cells_w, cells_h)
             elif player_pos.y < 0:
                 new_pos.y = SCREEN_H
                 mapgen_count = 0
-                cells = initialise_map(screen, cells_w, cells_h)
+                cells = initialise_map(cells_w, cells_h)
 
             # Draw the map
             for row, col in np.ndindex(cells.shape):

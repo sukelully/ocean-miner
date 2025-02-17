@@ -1,2 +1,2 @@
 # ocean-miner
-A simple game made with PyGame.
+A simple procedurally generated game built with PyGame.

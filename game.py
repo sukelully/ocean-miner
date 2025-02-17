@@ -24,8 +24,6 @@ velocity = pygame.Vector2(0, 0)
 # Set the frame rate
 clock = pygame.time.Clock()
 
-
-
 # Draw player at specified position
 def drawPlayer(screen):
     pygame.draw.rect(screen, (0, 175, 255), (int(player_pos.x), int(player_pos.y), player_width, player_height))
@@ -90,6 +88,10 @@ def generate_map(screen, cells, size):
     temp[temp_h - 1, mid_col-5:mid_col+5] = 0
 
     return temp
+
+def generate_flora(screen, cells, size):
+    for row, col in np.ndindex(cells.shape):
+        walls = np.sum(cells[row - 1:row + 2, col - 1:col + 2]) - cells[row, col]   # Change values for different maps
 
 def main():
     global velocity, player_pos  # Ensure these persist across frames

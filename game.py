@@ -7,13 +7,13 @@ SCREEN_W, SCREEN_H = 800, 600
 WALL_COLOR = (50, 50, 50)
 GRID_COLOR = (0, 0, 0)
 FLOOR_COLOR = (255, 255, 255)
-FLOOR_NEXT_COL = (0, 0, 255)
+TEST_COLOR = (255, 0, 0)
 FLOOR_PROB = 0.7
 WALL_PROB = 0.3
 ACCELERATION = 0.1
 FRICTION = 0.05
 MAX_SPEED = 3
-mapgen_count = 0
+mapgen_iterations = 4
 
 # Player attributes
 player_width = 20
@@ -66,7 +66,14 @@ def generate_map(screen, cells, size):
 
     for row, col in np.ndindex(cells.shape):
         walls = np.sum(cells[row - 1:row + 2, col - 1:col + 2]) - cells[row, col]   # Change values for different maps
-        color = FLOOR_COLOR if cells[row, col] == 0 else WALL_COLOR
+        # color = FLOOR_COLOR if cells[row, col] == 0 else WALL_COLOR
+        match cells[row, col]:
+            case 0:
+                color = FLOOR_COLOR
+            case 1:
+                color = WALL_COLOR
+            case 2:
+                color = TEST_COLOR
 
         # Rules governing wall creation
         if walls > 3:
@@ -82,10 +89,10 @@ def generate_map(screen, cells, size):
 
     # Create 5-cell wide exit points
     mid_row, mid_col = len(temp) // 2, len(temp[0]) // 2
-    temp[mid_row-5:mid_row+5, 0] = 0
-    temp[mid_row-5:mid_row+5, temp_w - 1] = 0
-    temp[0, mid_col-5:mid_col+5] = 0
-    temp[temp_h - 1, mid_col-5:mid_col+5] = 0
+    temp[mid_row-5:mid_row+5, 0:2] = 0
+    temp[mid_row-5:mid_row+5, temp_w - 2:temp_w] = 0
+    temp[0:2, mid_col-5:mid_col+5] = 0
+    temp[temp_h - 2:temp_h, mid_col-5:mid_col+5] = 0
 
     return temp
 
@@ -119,7 +126,7 @@ def main():
                 cells = initialise_map(cells_w, cells_h)
 
         # Map generation
-        if mapgen_count < 4:
+        if mapgen_count < mapgen_iterations:
             cells = generate_map(screen, cells, size)
             mapgen_count += 1
         else:
@@ -152,6 +159,7 @@ def main():
             player_rect = pygame.Rect(new_pos.x, new_pos.y, player_width, player_height)
             collision_detected = detect_collision(player_rect, cells, size)
 
+            # Bounce player off walls
             if collision_detected:
                 velocity *= -0.5
             else:

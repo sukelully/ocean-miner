@@ -24,20 +24,18 @@ velocity = pygame.Vector2(0, 0)
 # Set the frame rate
 clock = pygame.time.Clock()
 
-def generate_map(screen, cells, size, with_progress=False):
+# Generate a random map
+def generate_map(screen, cells, size):
     temp = np.zeros((cells.shape[0], cells.shape[1]))
     temp_w, temp_h = len(temp[0]), len(temp)
 
     for row, col in np.ndindex(cells.shape):
-        walls = np.sum(cells[row - 1:row + 2, col - 1:col + 2]) - cells[row, col]
+        walls = np.sum(cells[row - 1:row + 3, col - 1:col + 2]) - cells[row, col]   # Change values for different maps
         color = FLOOR_COLOR if cells[row, col] == 0 else WALL_COLOR
 
-        if walls > 4:
+        # Rules governing wall creation
+        if walls > 3:
             temp[row, col] = 1
-            if with_progress:
-                color = WALL_COLOR
-        elif cells[row, col] == 1 and with_progress:
-            color = FLOOR_NEXT_COL
 
         pygame.draw.rect(screen, color, (col * size, row * size, size - 1, size - 1))
 
@@ -63,13 +61,8 @@ def is_wall(x, y, cells, size):
     grid_x, grid_y = int(x / size), int(y / size)
     return cells[grid_y, grid_x] == 1
 
-def main():
-    global velocity, player_pos  # Ensure these persist across frames
-    pygame.init()
-    size = 10
-    cells_w, cells_h = SCREEN_W // size, SCREEN_H // size
-
-    # Initialize the map
+def initialise_map(screen, cells_w, cells_h):
+    # Initialise a blank map
     cells = np.random.choice(2, size=(cells_h, cells_w), p=[FLOOR_PROB, WALL_PROB])
     cells[0:cells_h, 0] = 1
     cells[0, 0:cells_w] = 1
@@ -77,6 +70,21 @@ def main():
     cells[cells_h - 1, 0:cells_w] = 1
 
     screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
+    screen.fill(GRID_COLOR)
+
+    return cells
+
+
+def main():
+    global velocity, player_pos  # Ensure these persist across frames
+    pygame.init()
+    size = 10
+    cells_w, cells_h = SCREEN_W // size, SCREEN_H // size
+
+    screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
+
+    cells = initialise_map(screen, cells_w, cells_h)
+
     screen.fill(GRID_COLOR)
 
     mapgen_count = 0
@@ -92,12 +100,11 @@ def main():
                 sys.exit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 mapgen_count = 0
-                generate_map(screen, cells, size)
-                print("Space!")
+                cells = initialise_map(screen, cells_w, cells_h)
 
         # Map generation
-        if mapgen_count < 2:
-            cells = generate_map(screen, cells, size, with_progress=True)
+        if mapgen_count < 3:
+            cells = generate_map(screen, cells, size)
             mapgen_count += 1
         else:
             # Player Movement Handling

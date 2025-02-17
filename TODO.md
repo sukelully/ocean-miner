@@ -1,1 +1,1 @@
-[ ] Add procgen resources
+- [ ] Add procgen resources

@@ -159,6 +159,24 @@ def main():
             else:
                 player_pos = new_pos
 
+            # Wrap window
+            if player_pos.x > SCREEN_W:
+                new_pos.x = 0
+                mapgen_count = 0
+                cells = initialise_map(screen, cells_w, cells_h)
+            elif player_pos.x < 0:
+                new_pos.x = SCREEN_W
+                mapgen_count = 0
+                cells = initialise_map(screen, cells_w, cells_h)
+            elif player_pos.y > SCREEN_H:
+                new_pos.y = 0
+                mapgen_count = 0
+                cells = initialise_map(screen, cells_w, cells_h)
+            elif player_pos.y < 0:
+                new_pos.y = SCREEN_H
+                mapgen_count = 0
+                cells = initialise_map(screen, cells_w, cells_h)
+
             # Draw the map
             for row, col in np.ndindex(cells.shape):
                 color = FLOOR_COLOR if cells[row, col] == 0 else WALL_COLOR

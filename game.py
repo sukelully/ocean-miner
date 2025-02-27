@@ -96,10 +96,6 @@ def generate_map(screen, cells, size):
 
     return temp
 
-def generate_flora(screen, cells, size):
-    for row, col in np.ndindex(cells.shape):
-        walls = np.sum(cells[row - 1:row + 2, col - 1:col + 2]) - cells[row, col]   # Change values for different maps
-
 def main():
     global velocity, player_pos  # Ensure these persist across frames
     pygame.init()
